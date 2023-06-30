@@ -47,5 +47,4 @@ func Log(c *gin.Context) {
 	}
 	info := model.Log()
 	c.JSON(200, gin.H{"code": 200, "msg": info, "data": ""})
-
 }
