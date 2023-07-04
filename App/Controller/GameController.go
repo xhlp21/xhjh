@@ -8,10 +8,10 @@ import (
 	"strconv"
 )
 
-// GameList 查出筛选的游戏推荐
-func GameList(c *gin.Context) {
+// GameListRecommend 查出筛选的游戏推荐
+func GameListRecommend(c *gin.Context) {
 	res := game.Game{}
-	list := res.GameList()
+	list := res.GameListRecommend()
 	c.JSON(http.StatusOK, gin.H{"error": 200, "msg": "", "data": list})
 }
 
@@ -30,4 +30,14 @@ func GameInfo(c *gin.Context) {
 	}
 	info := res.GameInfo()
 	c.JSON(http.StatusOK, gin.H{"error": 200, "msg": "", "data": info})
+}
+
+// GameList 全部游戏列表
+func GameList(c *gin.Context) {
+	gameName := c.Request.FormValue("gameName")
+	res := game.Game{
+		GameName: gameName,
+	}
+	list, _ := res.GameList()
+	c.JSON(http.StatusOK, gin.H{"error": 200, "msg": "", "data": list})
 }

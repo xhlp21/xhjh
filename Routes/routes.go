@@ -24,8 +24,9 @@ func main() {
 	//资源获取
 	game := routes.Group("game")
 	{
-		game.GET("/list", Controller.GameList)
+		game.GET("/list/recommend", Controller.GameListRecommend)
 		game.POST("/info", Controller.GameInfo)
+		game.GET("/list", Controller.GameList)
 	}
 
 	routes.Run()
