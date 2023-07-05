@@ -29,5 +29,13 @@ func main() {
 		game.GET("/list", Controller.GameList)
 	}
 
+	//游戏类型
+	types := routes.Group("type")
+	{
+		types.GET("/list",Controller.TypeList)
+		types.GET("/game",Controller.TypeGame)
+
+	}
+
 	routes.Run()
 }
