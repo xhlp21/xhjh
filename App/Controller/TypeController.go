@@ -17,6 +17,10 @@ func TypeList(c *gin.Context)  {
 // TypeGame 游戏类型列表
 func TypeGame(c *gin.Context)  {
 	typeId := c.Request.FormValue("type_id")
+	if typeId == ""{
+		c.JSON(http.StatusOK, gin.H{"error": 0, "msg": "", "data": ""})
+		return
+	}
 	res := _type.Type{}
 	list, err := res.TypeGame(typeId)
 	if err != nil{
