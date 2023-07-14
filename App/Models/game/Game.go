@@ -21,18 +21,19 @@ type Game struct {
 	Time       string `json:"time"`
 	TypeName   string `json:"type_name"`
 	Count      int    `json:"count"`
+	IsDelete   int    `json:"is_delete"`
 }
 
 // GameListRecommend 查出筛选的游戏推荐
 func (g Game) GameListRecommend() (game []Game) {
-	rows, err := Config.SqlDB.Query("SELECT * FROM xhj_game where recommend = ?", 1)
+	rows, err := Config.SqlDB.Query("SELECT * FROM xhj_game WHERE recommend = ? AND is_delete = ?", 1, 0)
 	if err != nil {
 		log.Fatal(err.Error())
 	}
 
 	for rows.Next() {
-		gl := Game{}                                                                                                                              // 假设 Game 是代表游戏的结构体类型
-		err := rows.Scan(&gl.GameId, &gl.GameName, &gl.Image, &gl.MagnetUrl, &gl.Type, &gl.UserId, &gl.Recommend, &gl.CreateTime, &gl.UpdateTime) // 假设 Field1、Field2 是游戏的字段
+		gl := Game{}
+		err := rows.Scan(&gl.GameId, &gl.GameName, &gl.Image, &gl.MagnetUrl, &gl.Type, &gl.UserId, &gl.Recommend, &gl.CreateTime, &gl.UpdateTime, &gl.Name)
 		if err != nil {
 			log.Fatal(err.Error())
 		}
@@ -46,7 +47,7 @@ func (g Game) GameListRecommend() (game []Game) {
 // GameInfo 游戏详情页
 func (g Game) GameInfo() (game Game) {
 	gl := Game{}
-	res := Config.SqlDB.QueryRow("SELECT * FROM xhj_game where game_id = ?", g.GameId).Scan(&gl.GameId, &gl.GameName, &gl.Image, &gl.MagnetUrl, &gl.Type, &gl.UserId, &gl.Recommend, &gl.CreateTime, &gl.UpdateTime)
+	res := Config.SqlDB.QueryRow("SELECT * FROM xhj_game WHERE game_id = ? AND is_delete = ?", g.GameId, 0).Scan(&gl.GameId, &gl.GameName, &gl.Image, &gl.MagnetUrl, &gl.Type, &gl.UserId, &gl.Recommend, &gl.CreateTime, &gl.UpdateTime, &gl.Name)
 	if res != nil {
 		log.Fatal(res.Error())
 	}
@@ -61,7 +62,7 @@ func (g Game) GameList(page, limit int) ([]Game, error) {
 		SELECT a.game_id, a.game_name, a.image, a.magnet_url, a.type, a.user_id, a.recommend, a.create_time, a.update_time, b.name
 		FROM xhj_game a
 		JOIN xhj_user b ON a.user_id = b.user_id
-		WHERE a.game_name LIKE CONCAT(?, '%')
+		WHERE a.game_name LIKE CONCAT(?, '%') AND a.is_delete = 0
 		ORDER BY a.create_time DESC
 		LIMIT ? OFFSET ?
 	`
@@ -123,9 +124,9 @@ func (g Game) GameList(page, limit int) ([]Game, error) {
 	}
 
 	// 获取总行数
-	countQuery := `SELECT COUNT(*) FROM xhj_game WHERE game_name LIKE CONCAT(?, '%')`
+	countQuery := `SELECT COUNT(*) FROM xhj_game WHERE game_name LIKE CONCAT(?, '%') AND is_delete = ?`
 	var count int
-	err = Config.SqlDB.QueryRow(countQuery, g.GameName).Scan(&count)
+	err = Config.SqlDB.QueryRow(countQuery, g.GameName, 0).Scan(&count)
 	if err != nil {
 		return nil, err
 	}

@@ -17,17 +17,18 @@ type Type struct {
 	Recommend  int    `json:"recommend"`
 	CreateTime int `json:"create_time"`
 	UpdateTime int `json:"update_time"`
+	IsDelete int `json:"is_delete"`
 }
 
 // TypeList 类型列表
 func (t *Type) TypeList() (types []Type) {
-	res,err := Config.SqlDB.Query("select * from xhj_type")
+	res,err := Config.SqlDB.Query("select * from xhj_type where is_delete = 0")
 	if err != nil{
 		log.Fatal(err.Error())
 	}
 	for res.Next() {
 		t := Type{}
-		err := res.Scan(&t.TypeId,&t.TypeName,&t.CreateTime,&t.UpdateTime)
+		err := res.Scan(&t.TypeId,&t.TypeName,&t.CreateTime,&t.UpdateTime,&t.IsDelete)
 		if err != nil{
 			log.Fatal(err.Error())
 		}
@@ -36,8 +37,9 @@ func (t *Type) TypeList() (types []Type) {
 	return types
 }
 
+// TypeGame 专区游戏分类
 func (t *Type) TypeGame(typeName string) ([]Type, error) {
-	query := "SELECT * FROM xhj_game WHERE type LIKE ?"
+	query := "SELECT * FROM xhj_game WHERE type LIKE ? and is_delete = 0"
 	stmt, err := Config.SqlDB.Prepare(query)
 	if err != nil {
 		return nil, err
@@ -53,7 +55,7 @@ func (t *Type) TypeGame(typeName string) ([]Type, error) {
 	var types []Type
 	for rows.Next() {
 		t := Type{}
-		err := rows.Scan(&t.GameId, &t.GameName, &t.Image, &t.MagnetUrl, &t.Type, &t.UserId, &t.Recommend, &t.CreateTime, &t.UpdateTime)
+		err := rows.Scan(&t.GameId, &t.GameName, &t.Image, &t.MagnetUrl, &t.Type, &t.UserId, &t.Recommend, &t.CreateTime, &t.UpdateTime, &t.IsDelete)
 		if err != nil {
 			return nil, err
 		}
