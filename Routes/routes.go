@@ -37,5 +37,17 @@ func main() {
 
 	}
 
+	//网站网址
+	website := routes.Group("website")
+	{
+		website.GET("/list",Controller.WebsiteList)
+	}
+
+	//云文件上传
+	oss := routes.Group("oss")
+	{
+		oss.POST("/files",Controller.File)
+	}
+
 	routes.Run()
 }
